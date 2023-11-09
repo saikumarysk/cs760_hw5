@@ -30,6 +30,7 @@
 \usepackage{caption}
 \usepackage{multirow}
 \usepackage{bbm}
+\usepackage{subcaption}
 
 % \usepackage{kky}
 
@@ -142,6 +143,10 @@
 
 \newcommand{\red}[1]{\textcolor{red}{#1}}
 
+\newenvironment{soln}{
+    \leavevmode\color{blue}\ignorespaces
+}{}
+
 \def\x{\mathbf x}
 \def\y{\mathbf y}
 \def\w{\mathbf w}
@@ -177,8 +182,8 @@
 %%% NOTE:  Replace 'NAME HERE' etc., and delete any "\red{}" wrappers (so it won't show up as red)
 
 \author{
-\red{$>>$NAME HERE$<<$} \\
-\red{$>>$ID HERE$<<$}\\
+Saikumar Yadugiri \\
+9083079468, saikumar@cs.wisc.edu\\
 }
 
 \date{}
@@ -193,6 +198,7 @@ Use this latex file as a template to develop your homework. Submit your homework
 
 \vspace{0.1in}
 
+\paragraph{GitHub Link:} \href{https://github.com/saikumarysk/cs760_hw5}{\texttt{https://github.com/saikumarysk/cs760\_hw5}}
 
 \section{Clustering}
 
@@ -214,14 +220,22 @@ J(\mu_1^K, f; X_1^n) = \sum_{i=1}^n \sum_{k=1}^K \indfone(f(X_i) = k) \|X_i - \m
 Let $\Jcal_K(X_1^n) = \min_{\mu_1^K, f} J(\mu_1^K, f; X_1^n)$. Prove that
 $\Jcal_{K}(X_1^n)$ is a non-increasing function of $K$.
 
+\begin{soln}
+    The main idea is that when $K = n$, we have that each $X_i \in X_1^{n}$ is a centroid and thus $J(\mu_1^K, f; X_1^n) = 0$. This means that $\mathcal{J}_K(X_1^n) = 0$. On the other hand, when $K = 1$, we have a single centroid and there is at least one point in $X_1^n$ that is other than the centroid ($n > 1$). Hence, $J(\mu_1^K, f; X_1^n) > 0$. Thus $\mathcal{J}_K(X_1^n) > 0$. So, the function $\mathcal{J}_K(X_1^n)$ is not an increasing function. We need to show that it is non-increasing. The difference between $\mathcal{J}_K(X_1^n)$ and $\mathcal{J}_{K+1}(X_1^n)$ is the addition of another centroid and some change to some points' cluster label.
+
+    We will randomly choose a point $\tilde{X} \in X_1^n$ to be the new centroid and this is the only point in that cluster. Hence, the new $J(\mu_1^{K+1}, f; X_1^n)$ will be at most as much as $J(\mu_1^{K}, f; X_1^n)$ as we are subtracting the value for $\tilde{x}$ from $J(\mu_1^{K}, f; X_1^n)$. Hence, the minimum value (by choosing another mapping $f$) can only decrease. Hence, $\mathcal{J}_K(X_1^n) \geq \mathcal{J}_{K+1}(X_1^n)$.
+\end{soln}
+
 \item \textbf{(8 Points)}
 Consider the K-means (Lloyd's) clustering algorithm we studied in class. We
 terminate the algorithm when there are no changes to the objective.
 Show that the algorithm terminates in a finite number of steps.
 
+\begin{soln}
+    Note that $f$ maps between $n$ datapoints and $k$ clusters. Hence, there are only finite($k^n$) number of cluster assignments. As in each iteration of the $k$-means clustering algorithm, we decrease the clustering distance, we will eventually converge to the optimal one in finite number of steps when $J$ doesn't change. Hence, we will converge to the optimal value in finite number of steps and hence the algorithm halts after finite number of steps.
+\end{soln}
+
 \end{enumerate}
-
-
 
 \subsection{Experiment (20 Points)}
 
@@ -288,6 +302,47 @@ K-means, means for GMMs) and map them to the distribution with the closest mean.
 Points break down: 7 points each for implementation of each method, 6 points for reporting of
 evaluation metrics.
 
+\begin{soln}
+    These are the values I received for the evaluation of my K-Means algorithm. The results are tabulated in table \ref{tab:clust} and figure \ref{fig:clust}. My Gaussian Mixture Model implementation was not working properly. But the implementation is present in GitHub,
+
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{|c|c|c|}
+            \hline
+            $\sigma$ & \textbf{Clustering Accuracy} & \textbf{Clustering Objective} \\
+            \hline
+            0.5 & m & , \\
+            \hline
+            1 & m & , \\
+            \hline
+            2 & m & , \\
+            \hline
+            4 & m & , \\
+            \hline
+            8 & m & , \\
+            \hline
+        \end{tabular}
+        \caption{Clustering Metrics for K-Means Algorithm}
+        \label{tab:clust}
+    \end{table}
+
+    \begin{figure}[h]
+        \centering
+        \begin{subfigure}{0.5\textwidth}
+            \includegraphics[width=1.1\linewidth]{clustering_accuracy.png}
+            \label{fig:1a}
+            \caption{Clustering Accuracy}
+        \end{subfigure}% 
+        \begin{subfigure}{0.5\textwidth}
+            \includegraphics[width=1.1\linewidth]{clustering_objective.png}
+            \label{fig:1b}
+            \caption{Clustering Objective}
+        \end{subfigure}
+        \caption{Clustering Metrics for K-Means Algorithm}
+        \label{fig:clust}
+    \end{figure}
+\end{soln}
+
 
 \section{Linear Dimensionality Reduction}
 
@@ -301,12 +356,46 @@ Principal Components Analysis (PCA) is a popular method for linear dimensionalit
 Suppose we wish to find the first direction $a_1$ (such that $a_1^\top a_1 = 1$) to maximize $\frac{1}{n} \sum_i (a_1^\top x_i)^2$.
 Show that $a_1$ is the first right singular vector of $X$.
 
+\begin{soln}
+    Note that as
+    \begin{equation*}
+    X = \begin{bmatrix} x_1^\top \\ \vdots \\ x_n^\top \end{bmatrix}, X^\top X = \begin{bmatrix} x_1 & \ldots & x_n \end{bmatrix} \begin{bmatrix} x_1^\top \\ \vdots \\ x_n^\top \end{bmatrix} = \sum\limits_{i = 1}^{n} x_i x_i^\top
+    \end{equation*}
+    We can re-write
+    \begin{equation*}
+        \frac{1}{n} \sum\limits_{i = 1}^{n} (a_1^\top x_i)^2 = \frac{1}{n} \sum\limits_{i = 1}^{n} a_1^\top x_i x_i^\top a_1 = a_1^\top \frac{X^\top X}{n} a_1
+    \end{equation*}
+
+    If $X = U \Sigma V^\top$ (standard SVD form), $X^\top X = V \Sigma^T U^\top U \Sigma V^\top = V (\Sigma^\top \Sigma) V^\top$. Here, $\Sigma^\top \Sigma$ is a diagonal \emph{square} matrix. where each value is square of the singular values of $X$. Hence, $X^\top X = V (\Sigma^\top \Sigma) V^\top$ is the eigendecomposition of $X^\top X$ and each column of $V$ is an eigenvector of $X^\top X$. Since, the singular values in $\Sigma$ are in the non-increasing order, the first column of $V$, the first right singular vector of X is the eignvector for which $X^\top X$ has the highest eigenvalue.
+
+    We can prove a stronger result for convenience where for any non-zero vector $a_1$, the value $\frac{a_1^\top X^\top X a_1}{a_1^\top a_1}$ is maximized when $a_1$ is an eigenvector of $X^\top X$ which maximizes the eigenvalue. This is done simply by taking the gradient for the quantity and setting it to zero.
+
+    \begin{align*}
+        \frac{\nabla}{\nabla a_1} \left( \frac{a_1^\top X^\top X a_1}{a_1^\top a_1} \right) = 0 \iff a_1^\top a_1 (X^\top X) a_1 = ( a_1^\top X^\top X a_1 ) a_1
+    \end{align*}
+
+    Hence, the first right singular vector for $X$ maximizes the desired value.
+\end{soln}
+
 \item  \textbf{(6 Points)}
 Given $a_1, \dots, a_k$, let $A_k = [a_1, \dots, a_k]$ and 
 $\tilde{x}_i = x_i - A_kA_k^\top x_i$. We wish to find $a_{k+1}$, to maximize
 $\frac{1}{n} \sum_i (a_{k+1}^\top \tilde{x}_i)^2$. Show that $a_{k+1}$ is the
 $(k+1)^{th}$ right singular vector of $X$.
 
+\begin{soln}
+    This question is a re-wording of the \emph{Rayleigh Quotient Theorem}. My proof is going to be similar to a compact version of the proof of this theorem from Dan Spielman's book. Consider $M = X^\top X$. Then we can prove this result using induction. The base case when $k = 0$ is similar to the proof of the above result. Now, for $\tilde{X}$ defined as $\tilde{X} = [\tilde{x}_1^\top ; \ldots ; \tilde{x}_n^\top]$, we can see that $\frac{1}{n} \sum\limits_{i = 1}^{n} (a_{k+1}^\top \tilde{x}_i)^2 = a_{k+1}^\top \frac{\tilde{X}^\top \tilde{X}}{n} a_{k+1}$. Now, $\tilde{X} = X - X A_k A_k^\top$. Then,
+
+    \begin{align*}
+        \tilde{X}^\top \tilde{X} &= (I - A_k A_k^\top) X^\top X (I - A_k A_k^\top) \\
+        &= (I - A_k A_k^\top) V \Sigma^\top \Sigma V^\top (I - A_k A_k^\top) \\
+        &= \left(V - A_k \begin{bmatrix} a_1^\top \\ \vdots \\ a_k^\top \end{bmatrix} \begin{bmatrix} a_1^\top & \ldots & a_D^\top \end{bmatrix}\right) \Sigma^\top \Sigma \left( V^\top - \begin{bmatrix} a_1^\top \\ \vdots \\ a_D^\top \end{bmatrix} \begin{bmatrix} a_1 & \ldots & a_k \end{bmatrix} A_k^\top \right) \\
+        &= (V - A_k \begin{bmatrix} I_k &  0 \end{bmatrix}) \Sigma^\top \Sigma (V^\top - \begin{bmatrix} I_k \\ 0 \end{bmatrix} A_k^\top) \\
+        &= \begin{bmatrix} 0 & \ldots & 0 & a_{k+1} & \ldots & a_D \end{bmatrix} \Sigma^\top \Sigma \begin{bmatrix} 0 \\ \vdots \\ 0 \\ a_{k+1}^\top \\ \vdots \\ a_D^\top \end{bmatrix}
+    \end{align*}
+
+    Hence, the maximizing value is the $(k+1)$-th right singular vector of $X$.
+\end{soln}
 
 \end{enumerate}
 
@@ -346,6 +435,16 @@ Show that both
 $(A_1, b_1, Z_1)$ and $(A_2, b_2, Z_2)$ achieve the same objective value $J$~\eqref{eqn:dimobj}.
 \end{enumerate}
 
+\begin{soln}
+    \begin{align*}
+        X - Z_2 A_2^\top - \one b_2^\top &= X - (Z_1 M^\top + \one p^\top) (A_1 M^{-1})^\top - \one (b_1 - A_1 M^{-1} p)^\top \\
+        &= X - Z_1 M^\top (M^{-1})^\top A_1^\top - \one p^\top (M^{-1})^\top A_1^\top - \one b_1^\top + \one (A_1 M^{-1} p)^\top \\
+        &= X - Z_1 (M^{-1}M)^\top A_1^\top - \one p^\top (M^{-1})^\top A_1^\top - \one b_1^\top + \one p^\top (M^{-1})^\top A_1^\top \\
+        &= X - Z_1 A_1^\top - \one b_1^\top \\
+        \text{Hence, } J(A_1, b_1, Z_1) &= J(A_2, b_2, Z_2).
+    \end{align*}
+\end{soln}
+
 Therefore, in order to make the problem determined, we need to impose some
 constraint on $Z$. We will assume that the $z_i$'s have zero mean and identity covariance.
 That is,
@@ -366,6 +465,27 @@ would obtain $A, Z, b$ which minimize the objective and satisfy the constraints.
 \textbf{Hint: }The rank $k$ approximation of a matrix in Frobenius norm is obtained by
 taking its SVD and then zeroing out all but the first $k$ singular values.
 
+\begin{soln}
+    Let's derive optimal $b$. We can re-write $J(A, b, Z)$ as
+
+    \begin{align*}
+        J(A, b, Z) &= \frac{1}{n} \sum\limits_{i = 1}^{n} (x_i - A z_i - b)^\top (x_i - A z_i -b) \\
+        &= \frac{1}{n} \sum\limits_{i = 1}^{n} (x_1^\top - z_i^\top A^\top - b^\top)(x_i -A z_i - b) \\
+        &= \frac{1}{n} \sum\limits_{i = 1}^{n} (-x_i^\top b + z_i^\top A^\top b - b^\top x_i + b^\top A z_i + b^\top b) + (\text{constant w.r.to b}) \\
+        \implies \frac{\nabla J}{\nabla b} &= \frac{1}{n} \sum\limits_{i = 1}^{n} (-x_i^\top + z_i^\top A^\top - x_i^\top + z_i^\top A^\top_i + 2b)
+    \end{align*}
+    We obtain the minimizing value of $b$ by setting the gradient to $0$. This is because clearly the second gradient derivative is $2$ which is greater than $0$.
+    \begin{gather*}
+        \frac{\nabla J}{\nabla b} = 0 \\
+        \implies \sum\limits_{i = 1}^{n} (-x_i^\top + z_i^\top A^\top + b) = 0 \\
+        \implies b = \frac{\sum\limits_{i = 1}^{n} (x_i^\top - z_i^\top A^\top)}{n} \\
+        \implies b = \frac{1}{n} \sum\limits_{i = 1}^{n} x_i^\top = \frac{1}{n} X^\top \one_n
+    \end{gather*}
+
+    The last step is because we have $Z^\top \one_n = 0$ (we will derive this here).
+    Now, we obtain $A$ and $Z$ using $b$ as derived above. As we need $X = ZA^\top + \one_n b^\top$, we need to optimize $ZA^\top = X - \one_n b^\top$. We need that $Z^\top Z = n I_d$. So, $Z$ is nearly an orthogonal matrix. One good candidate for that would be the left singular matrix of the SVD of $X - \one_n b^\top$. That is, consider $X - \one_n b^\top = U \Sigma V^\top$ (SVD). Using the hint, we want to restrict this to $d$-approximation by considering the first $d$ singular values and hence the $d \times d$ top-left sub-matrix of $\Sigma$. Let's denote this by $\Sigma^{(d)}$. Then choose the first $d$ columns of $U$ and $V$ as these will be the only singular vectors that matter. Let's call these $U^{(d)}$ and $V^{(d)}$. Then, we have $ZA^\top = U^{(d)} \Sigma^{(d)} (V^{(d)})^\top$. Now, we can use $Z = \sqrt{n} U^{(d)}$ and correspondingly $A = \frac{1}{\sqrt{n}}V^{(d)} \Sigma^{(d)}$. Now, we also need that $Z^\top \one_n = 0$. Then, $AZ^\top \one_n = V^{(d)}\Sigma^{(d)} (U^{(d)})^\top \one_n = 0$. Now, $V^{(d)}$ is a full-column rank matrix as $d < n$, $d < D$, and columns of $V^{(d)}$ are orthogonal and hence linearly independent. $\Sigma^{(d)}$ is also a diagonal matrix and hence $V^{(d)}\Sigma^{(d)}$ is a full column-rank matrix. Hence, left multiplication to a full-column rank matrix is not zero as a left-inverse exists. Hence, it should be that $(U^{(d)})^\top \one_n = 0$ and hence, $Z^\top \one_n = 0$.
+\end{soln}
+\pagebreak
 \item \textbf{(3 Points)}
 You are given a point $x_*$ in the original $D$ dimensional space.
 State the rule to obtain the $d$ dimensional
@@ -373,9 +493,10 @@ representation $z_*$ for this new point.
 (If $x_*$ is some original point $x_i$ from the $D$--dimensional space, it shoud be the
 $d$--dimensional representation $z_i$.)
 
-
+\begin{soln}
+    As this is an affine transformation, we have that $x_\ast = A z_\ast + b$. Hence, $A z_\ast = x_\ast - b$. However, $A$ might be a full column-rank and thus right inverse might not exist. In this case, we can use $A^\top$ to make LHS have a square matrix and then take the inverse. That is, $A^\top A z_\ast = A^\top (x_\ast - b)$. Then, $z_\ast = (A^\top A)^{-1} A^\top (x_\ast - b)$. As $A^\top A$ is a symmetric matrix, it might have a pseudo-inverse which can be used.
+\end{soln}
 \end{enumerate}
-
 
 \subsection{Experiment (34 points)}
 
@@ -419,6 +540,16 @@ $d$. For this, observe the singular values in DRO and see if there is a clear
 ``knee point" in the spectrum.
 Attach any figures/ Statistics you computed to justify your choice.
 
+\begin{soln}
+    I chose $d = 30$. This evident from the knee present in the SVD values. The justification plot can be found in Figure \ref{fig:svd1000D}. Note that this is a zoomed-in plot as the range of values is too high.
+    \begin{figure}[h]
+        \centering
+        \includegraphics{svd1000D.png}
+        \caption{SVD Values From 2 to 99 For \textsf{data1000D.csv}}
+        \label{fig:svd1000D}
+    \end{figure}
+\end{soln}
+
 \item
 For the $2D$ dataset you need to attach the a 
 plot comparing the orignal points with the reconstructed points for all 4
@@ -429,6 +560,58 @@ where $x_i$'s are the original points and $r(z_i)$ are the $D$ dimensional point
 reconstructed from the 
 $d$ dimensional representation $z_i$.
 
+\begin{soln}
+    The required numbers are provided in table \ref{tab:recerr}. The reconstruction plots can be found in figure \ref{fig:3}. In all the figures, blue circles are the original data points and red x markers are reconstructed points.
+    \begin{table}[h]
+        \centering
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{Method} & \textbf{Reconstruction Error - 2D} & \textbf{Reconstruction Error - 1000D} \\
+            \hline
+            Buggy & 38.396359916101076 & 13163.110154859782 \\
+            \hline
+            Demean & 4.097135348936227 & 8259.74014907716 \\
+            \hline
+            Norm & 9.014756571421726 & 8268.5467161029 \\
+            \hline
+            DRO & 4.097135348936228 & 8259.74014907716 \\
+            \hline
+        \end{tabular}
+        \caption{Reconstruction Errors for Various Methods for \textsf{data2D.csv} and \textsf{data1000D.csv}}
+        \label{tab:recerr}
+    \end{table}
+
+    \begin{figure}[h]
+        \centering
+        \begin{subfigure}{0.5\textwidth}
+            \centering
+            \includegraphics[width=1.1\linewidth]{buggy2D.png}
+            \caption{Buggy PCA}
+        \label{fig:3a}
+        \end{subfigure}% 
+        \begin{subfigure}{0.5\textwidth}
+            \centering
+            \includegraphics[width=1.1\linewidth]{demean2D.png}
+            \caption{Demean PCS}
+        \label{fig:3b}
+        \end{subfigure}
+        \begin{subfigure}{0.5\textwidth}
+            \centering
+            \includegraphics[width=1.1\linewidth]{norm2D.png}
+            \caption{Norm PCA}
+        \label{fig:3c}
+        \end{subfigure}% 
+        \begin{subfigure}{0.5\textwidth}
+            \centering
+            \includegraphics[width=1.1\linewidth]{dro2D.png}
+            \caption{DRO}
+        \label{fig:3d}
+        \end{subfigure}
+        \caption{Reconstructed and Original Datapoints for \textsf{data2D.csv}}
+        \label{fig:3}
+    \end{figure}
+\end{soln}
+
 \item \textbf{Questions:} After you have completed the experiments, please answer the following questions.
 \begin{enumerate}
 \item Look at the results for Buggy PCA. The reconstruction error is bad and the
@@ -436,11 +619,17 @@ reconstructed points don't seem to well represent the original points. Why is
 this? \\
 \textbf{Hint: } Which subspace is Buggy PCA trying to project the points
 onto?
+\begin{soln}
+    As we are trying to find $A$ such that $x_i = Az_i$, we are always working on the linear domain and hence, we are projecting onto a line that passes through the origin. However, by viewing the dataset, it is clear that the approximation of datapoints don't pass through origin and hence we get a heavy reconstruction error.
+\end{soln}
 \item The error criterion we are using is the average squared error 
 between the original points and the reconstructed points.
 In both examples DRO and demeaned PCA achieves the lowest error among all
 methods. 
 Is this surprising? Why?
+\begin{soln}
+    In the de-meaned version, we remove the mean, do PCA and then for re-construction, add the mean back. In DRO, we do the similar thing as our affine term, $b$ is the mean of the data. Hence, both of them have the same re-construction noise. Moreover, affiner transformation should ``fit'' the data perfectly as evident from visualizing the data. Hence, it is not surprising that both these operations have the least re-construction noise and both of them minimize the error. Normalized version fails here as we are disrupting the standard deviation of the data prior to the SVD.
+\end{soln}
 \end{enumerate}
 
 \item Point allocation:
@@ -477,6 +666,5 @@ And this is how the reconstruction error may look like for Buggy PCA for the 2D 
 
 
 \bibliographystyle{apalike}
+
 \end{document}
-
-
